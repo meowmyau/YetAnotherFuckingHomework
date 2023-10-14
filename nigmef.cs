@@ -1,20 +1,41 @@
-﻿namespace MEOW.nigmef2
+namespace MEOW.nigmef2
 {
     public class nigmef
     {
         public static void Run()
         {
-            Q3Test();
+            Q1Test();
         }
 
         private static void Q1Test()
         {
-            Graph graph = new();
+            Graph graph;
+
+            Console.WriteLine("Выберите тип графа:");
+            Console.WriteLine("1. Ориентированный");
+            Console.WriteLine("2. Неориентированный");
+
+            string choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    graph = new(true);
+                    break;
+                case "2":
+                    graph = new (); // Создаем неориентированный граф
+                    break;
+                default:
+                    Console.WriteLine("Неверный выбор. Используется стандартный неориентированный граф.");
+                    graph = new (); // По умолчанию используется неориентированный граф
+                    break;
+            }
+                
+            //Для теста, чтоб ручками не писать
             graph.AddEdge("A", "B");    //A - B   E
             graph.AddEdge("A", "C");    //|       |
             graph.AddVertex("E");       //C       F
             graph.AddEdge("E", "F");
-
+            
             while (true)
             {
                 Console.WriteLine("1. Добавить вершину");
@@ -66,7 +87,7 @@
                     case "8":
                         return;
                     default:
-                        Console.WriteLine("Invalid choice. Try again.");
+                        Console.WriteLine("Ошибка, попробуй еще раз");
                         break;
                 }
             }
@@ -179,8 +200,7 @@
         #region Задача 1
 
         private bool _directed; // Флаг, указывающий, является ли граф ориентированным.
-        private Dictionary<string, List<(string, int)>> _adjacencyList; // Список смежности, 
-        //Словарь от строки, которая представляет имя вершины и списка кортежей (строка, число), которые представляют имя связанной вершины и вес
+        private Dictionary<string, List<(string, int)>> _adjacencyList; // Список смежности.
 
         // Конструктор для создания пустого графа.
         public Graph(bool directed = false)
