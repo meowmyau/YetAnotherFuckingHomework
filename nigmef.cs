@@ -201,6 +201,7 @@ namespace MEOW.nigmef2
 
         private bool _directed; // Флаг, указывающий, является ли граф ориентированным.
         private Dictionary<string, List<(string, int)>> _adjacencyList; // Список смежности.
+        //Словарь от строки, которая представляет имя вершины и списка кортежей (строка, число), которые представляют имя связанной вершины и вес
 
         // Конструктор для создания пустого графа.
         public Graph(bool directed = false)
