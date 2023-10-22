@@ -4,7 +4,7 @@ namespace MEOW.nigmef2
     {
         public static void Run()
         {
-            Q1Test();
+            Q4Test();
         }
 
         private static void Q1Test()
@@ -50,7 +50,7 @@ namespace MEOW.nigmef2
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        Console.Write("Введите имя вершину: ");
+                        Console.Write("Введите имя вершины: ");
                         graph.AddVertex(Console.ReadLine());
                         break;
                     case "2":
@@ -181,16 +181,16 @@ namespace MEOW.nigmef2
         {
             Graph graph = new Graph();
             graph.AddEdge("A", "B", 1);
-            graph.AddEdge("A", "C", 3);
-            graph.AddEdge("A", "D", 2);
-            graph.AddEdge("C", "D", 4);
+            graph.AddEdge("A", "C", 1);
+            graph.AddEdge("A", "D", 1);
+            graph.AddEdge("C", "D", 1);
 
             Console.WriteLine("Оригинальный граф:");
             graph.Print();
 
-            Graph mst = graph.KruskalMST();
-            Console.WriteLine("\nМинимальное остовное дерево:");
-            mst.Print();
+            var mst = graph.KruskalMST();
+            Console.WriteLine("\n" + $"Вес инимального остовного дерева: {mst.Item2}");
+            mst.Item1.Print();
         }
     }
 
@@ -201,7 +201,7 @@ namespace MEOW.nigmef2
 
         private bool _directed; // Флаг, указывающий, является ли граф ориентированным.
         private Dictionary<string, List<(string, int)>> _adjacencyList; // Список смежности.
-        //Словарь от строки, которая представляет имя вершины и списка кортежей (строка, число), которые представляют имя связанной вершины и вес
+        //Словарь от строки, которая представляет имя вершины и списка кортежей (строка, число), которые представляют имя связанной вершины и вес5
 
         // Конструктор для создания пустого графа.
         public Graph(bool directed = false)
@@ -307,8 +307,11 @@ namespace MEOW.nigmef2
         // Метод удаления ребра.
         public void RemoveEdge(string from, string to)
         {
-            if (!_adjacencyList.ContainsKey(from))
+            if (!_adjacencyList.ContainsKey(from) || !_adjacencyList.ContainsKey(to))
+            {
+                Console.WriteLine("Одна или обе вершины не существуют");
                 return;
+            }
 
             // Удаление направленного ребра.
             _adjacencyList[from].RemoveAll(edge => edge.Item1 == to);
@@ -627,7 +630,7 @@ namespace MEOW.nigmef2
         #endregion
         
         #region Задача 4
-        public Graph KruskalMST()
+        public (Graph, int) KruskalMST()
         {
             // Создание нового графа для хранения минимального остовного дерева (MST).
             Graph mst = new Graph();
@@ -637,15 +640,15 @@ namespace MEOW.nigmef2
 
             // Инициализация каждой вершины как отдельного множества.
             foreach (var vertex in _adjacencyList.Keys)
-            {
                 parent[vertex] = vertex;
-            }
 
             // Получение списка всех рёбер графа и их сортировка по весу.
             var sortedEdges = _adjacencyList
                 .SelectMany(kvp => kvp.Value.Select(adj => new { Source = kvp.Key, Destination = adj.Item1, Weight = adj.Item2 }))
                 .OrderBy(edge => edge.Weight)
                 .ToList();
+            
+            int totalWeight = 0; // Для хранения общего веса MST
 
             // Перебор всех рёбер графа в порядке возрастания веса.
             foreach (var edge in sortedEdges)
@@ -658,13 +661,14 @@ namespace MEOW.nigmef2
                 if (root1 != root2)
                 {
                     mst.AddEdge(edge.Source, edge.Destination, edge.Weight);
+                    totalWeight += edge.Weight; // Добавляем вес ребра к общему весу
                     // Объединение двух множеств.
                     Union(root1, root2, parent);
                 }
             }
 
             // Возвращаем построенное минимальное остовное дерево.
-            return mst;
+            return (mst, totalWeight);
         }
 
         private string Find(string vertex, Dictionary<string, string> parent)
