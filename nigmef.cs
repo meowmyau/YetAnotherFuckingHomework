@@ -4,7 +4,7 @@ namespace MEOW.nigmef2
     {
         public static void Run()
         {
-            Q4Test();
+            Q3Test();
         }
 
         private static void Q1Test()
@@ -35,6 +35,7 @@ namespace MEOW.nigmef2
             graph.AddEdge("A", "C");    //|       |
             graph.AddVertex("E");       //C       F
             graph.AddEdge("E", "F");
+                
             
             while (true)
             {
@@ -107,9 +108,9 @@ namespace MEOW.nigmef2
 
             //BuildComplementGraph
             Graph graph2 = new Graph();
-            graph2.AddVertex("A");
-            graph2.AddVertex("B");
+            graph2.AddEdge("A", "B");
             graph2.AddVertex("C");
+            
             Graph complementGraph = Graph.BuildComplementGraph(graph2);
             // Если предположить, что у нас есть только три вершины: A, B и C, 
             // то complementGraph содержит рёбра: A-C и B-C
@@ -120,13 +121,12 @@ namespace MEOW.nigmef2
             Graph g1 = new Graph();
             g1.AddEdge("A", "B");
             Graph g2 = new Graph();
-            g2.AddEdge("B", "C");
+            g2.AddEdge("A", "D"); //TODO
 
             Graph unionGraph = Graph.Union(g1, g2);
             // unionGraph содержит рёбра: A-B, B-C
             Console.WriteLine("Union");
-            unionGraph.Print();
-            
+            unionGraph?.Print();
             //Join
             Graph g3 = new Graph();
             g3.AddVertex("A");
@@ -135,7 +135,7 @@ namespace MEOW.nigmef2
             Graph joinGraph = Graph.Join(g3, g4);
             // joinGraph содержит ребро: A-B
             Console.WriteLine("Join");
-            joinGraph.Print();
+            joinGraph?.Print();
         }
 
         private static void Q3Test()
@@ -145,10 +145,10 @@ namespace MEOW.nigmef2
             tree.AddEdge("A", "B");     //|   
             tree.AddEdge("A", "C");     //C
 
-            Graph cyclicGraph = new Graph(true);
+            Graph cyclicGraph = new Graph(true); //TODO
             cyclicGraph.AddEdge("A", "B");   //A - B
-            cyclicGraph.AddEdge("A", "C");   //|   |
-            cyclicGraph.AddEdge("B", "D");   //C - D
+            cyclicGraph.AddEdge("B", "D");   //|   |
+            cyclicGraph.AddEdge("C", "A");   //C - D
             cyclicGraph.AddEdge("C", "D");
             
             Graph forest = new Graph(true);
@@ -166,9 +166,10 @@ namespace MEOW.nigmef2
             graph.AddEdge("A", "B");
             graph.AddEdge("B", "C");
             graph.AddEdge("C", "A");
+            graph.AddEdge("C", "D");
             graph.AddEdge("D", "E");
             graph.AddEdge("E", "F");
-            graph.AddEdge("F", "D");
+            
 
             Console.WriteLine("Оригинальный граф:");
             graph.Print();
@@ -180,10 +181,11 @@ namespace MEOW.nigmef2
         private static void Q4Test()
         {
             Graph graph = new Graph();
-            graph.AddEdge("A", "B", 1);
-            graph.AddEdge("A", "C", 1);
-            graph.AddEdge("A", "D", 1);
-            graph.AddEdge("C", "D", 1);
+            graph.AddEdge("1", "2", 5);
+            graph.AddEdge("1", "3", 3);
+            graph.AddEdge("1", "4", 4);
+            graph.AddEdge("3", "4", 11);
+            graph.AddEdge("2", "4", 13);
 
             Console.WriteLine("Оригинальный граф:");
             graph.Print();
@@ -406,6 +408,15 @@ namespace MEOW.nigmef2
                 Console.WriteLine("Ориентированность не совпадает");
                 return null;
             }
+
+            // Проверка на пересечение множеств вершин
+            var intersectingVertices = g1._adjacencyList.Keys.Intersect(g2._adjacencyList.Keys).ToList();
+            if (intersectingVertices.Count > 0)
+            {
+                Console.WriteLine("Графы имеют вершины с одинаковыми названиями: " + string.Join(", ", intersectingVertices));
+                return null;
+            }
+
             // Создаем новый граф, который будет содержать объединение двух графов.
             Graph unionGraph = new Graph(g1._directed);
 
